@@ -20,18 +20,35 @@ public class PostController {
     // fetch all posts
     @GetMapping
     public ResponseEntity<List<PostDto>> getAllPosts() {
-        return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.OK);
+        List<PostDto> postDtos = postService.getAllPosts();
+        return new ResponseEntity<>(postDtos, HttpStatus.OK);
     }
 
     // fetch post by id
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") long id){
-        return ResponseEntity.ok(postService.getPostById(id));
+    public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") long id) {
+        PostDto postDto = postService.getPostById(id);
+        return ResponseEntity.ok(postDto);
     }
 
     // create new blog post
     @PostMapping
     public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        return new ResponseEntity<>(postService.createPost(postDto), HttpStatus.CREATED);
+        PostDto postResponse = postService.createPost(postDto);
+        return new ResponseEntity<>(postResponse, HttpStatus.CREATED);
+    }
+
+    // update post by id
+    @PutMapping("/{id}")
+    public ResponseEntity<PostDto> updatePost(@RequestBody PostDto postDto, @PathVariable(name = "id") long id) {
+        PostDto updatedDto = postService.updatePost(postDto, id);
+        return new ResponseEntity<>(updatedDto, HttpStatus.OK);
+    }
+
+    // delete post by id
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePostById(@PathVariable(name = "id") long id) {
+        postService.deletePost(id);
+        return new ResponseEntity<>("Post deleted successfully", HttpStatus.OK);
     }
 }

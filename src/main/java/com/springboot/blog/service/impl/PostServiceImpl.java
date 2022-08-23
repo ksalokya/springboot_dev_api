@@ -40,6 +40,20 @@ public class PostServiceImpl implements PostService {
         return postDto;
     }
 
+
+    @Override
+    public List<PostDto> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+    }
+
+    @Override
+    public PostDto getPostById(long id) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Post", "ID", id));
+        return mapToDto(post);
+    }
+
     @Override
     public PostDto createPost(PostDto postDto) {
         // covert DTO to entity
@@ -53,15 +67,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        return posts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+    public PostDto updatePost(PostDto postDto, long id) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Post", "ID", id));
+
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+        post.setDescription(postDto.getDescription());
+
+        Post updatedPost = postRepository.save(post);
+
+        return mapToDto(updatedPost);
     }
 
     @Override
-    public PostDto getPostById(long id) {
+    public void deletePost(long id) {
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Post", "ID", id));
-        return mapToDto(post);
+
+        postRepository.deleteById(id);
     }
 }
