@@ -2,10 +2,12 @@ package com.springboot.blog.service.impl;
 
 import com.springboot.blog.entity.Post;
 import com.springboot.blog.exception.ResourceNotFoundException;
+import com.springboot.blog.payload.PostResponse;
 import com.springboot.blog.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.springboot.blog.payload.PostDto;
@@ -43,24 +45,39 @@ public class PostServiceImpl implements PostService {
         return postDto;
     }
 
+    // converts List of postDto to postResponse
+    private PostResponse mapToPostResponse(List<PostDto> contents, Page<Post> posts) {
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(contents);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+        return postResponse;
+    }
 
     @Override
-    public List<PostDto> getAllPosts(int pageNo, int pageSize) {
-        // create pageable instance
-        Pageable pageable = PageRequest.of(pageNo,pageSize);
+    public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
+        // creating Sort object depending on param
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
+        // create pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Post> posts = postRepository.findAll(pageable);
 
         // get content of page object
         List<Post> listOfPosts = posts.getContent();
+        List<PostDto> contents = listOfPosts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
 
-        return listOfPosts.stream().map(post -> mapToDto(post)).collect(Collectors.toList());
+        // map results to postResponse and return
+        return mapToPostResponse(contents, posts);
     }
 
     @Override
     public PostDto getPostById(long id) {
-        Post post = postRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Post", "ID", id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "ID", id));
         return mapToDto(post);
     }
 
