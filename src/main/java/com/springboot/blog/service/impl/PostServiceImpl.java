@@ -26,37 +26,6 @@ public class PostServiceImpl implements PostService {
         this.postRepository = postRepository;
     }
 
-    // coverts DTO to entity
-    private Post mapToEntity(PostDto postDto) {
-        Post post = new Post();
-        post.setTitle(postDto.getTitle());
-        post.setDescription(postDto.getDescription());
-        post.setContent(postDto.getContent());
-        return post;
-    }
-
-    // converts entity to DTO
-    private PostDto mapToDto(Post post) {
-        PostDto postDto = new PostDto();
-        postDto.setId(post.getId());
-        postDto.setTitle(post.getTitle());
-        postDto.setDescription(post.getDescription());
-        postDto.setContent(post.getContent());
-        return postDto;
-    }
-
-    // converts List of postDto to postResponse
-    private PostResponse mapToPostResponse(List<PostDto> contents, Page<Post> posts) {
-        PostResponse postResponse = new PostResponse();
-        postResponse.setContent(contents);
-        postResponse.setPageNo(posts.getNumber());
-        postResponse.setPageSize(posts.getSize());
-        postResponse.setTotalElements(posts.getTotalElements());
-        postResponse.setTotalPages(posts.getTotalPages());
-        postResponse.setLast(posts.isLast());
-        return postResponse;
-    }
-
     @Override
     public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
         // creating Sort object depending on param
@@ -113,5 +82,37 @@ public class PostServiceImpl implements PostService {
                 () -> new ResourceNotFoundException("Post", "ID", id));
 
         postRepository.deleteById(id);
+    }
+
+
+    // coverts DTO to entity
+    private Post mapToEntity(PostDto postDto) {
+        Post post = new Post();
+        post.setTitle(postDto.getTitle());
+        post.setDescription(postDto.getDescription());
+        post.setContent(postDto.getContent());
+        return post;
+    }
+
+    // converts entity to DTO
+    private PostDto mapToDto(Post post) {
+        PostDto postDto = new PostDto();
+        postDto.setId(post.getId());
+        postDto.setTitle(post.getTitle());
+        postDto.setDescription(post.getDescription());
+        postDto.setContent(post.getContent());
+        return postDto;
+    }
+
+    // converts List of postDto to postResponse
+    private PostResponse mapToPostResponse(List<PostDto> contents, Page<Post> posts) {
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(contents);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setLast(posts.isLast());
+        return postResponse;
     }
 }
