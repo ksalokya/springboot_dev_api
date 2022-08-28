@@ -10,10 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/posts")
 public class PostController {
     private PostService postService;
 
@@ -22,7 +20,7 @@ public class PostController {
     }
 
     // fetch all posts
-    @GetMapping
+    @GetMapping("/api/v1/posts")
     public ResponseEntity<PostResponse> getAllPosts(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
@@ -34,7 +32,7 @@ public class PostController {
     }
 
     // fetch post by id
-    @GetMapping("/{id}")
+    @GetMapping("/api/v1/posts/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable(name = "id") long id) {
         PostDto postDto = postService.getPostById(id);
         return ResponseEntity.ok(postDto);
@@ -42,7 +40,7 @@ public class PostController {
 
     // create new blog post
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping("/api/v1/posts")
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
         PostDto postResponse = postService.createPost(postDto);
         return new ResponseEntity<>(postResponse, HttpStatus.CREATED);
@@ -50,7 +48,7 @@ public class PostController {
 
     // update post by id
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping("/api/v1/posts/{id}")
     public ResponseEntity<PostDto> updatePost(@Valid @RequestBody PostDto postDto, @PathVariable(name = "id") long id) {
         PostDto updatedDto = postService.updatePost(postDto, id);
         return new ResponseEntity<>(updatedDto, HttpStatus.OK);
@@ -58,7 +56,7 @@ public class PostController {
 
     // delete post by id
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/api/v1/posts/{id}")
     public ResponseEntity<String> deletePostById(@PathVariable(name = "id") long id) {
         postService.deletePost(id);
         return new ResponseEntity<>("Post deleted successfully", HttpStatus.OK);
